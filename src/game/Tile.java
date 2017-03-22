@@ -9,12 +9,10 @@ public class Tile {
     public Image tileImage;
 
     private Background bg = Body.getBg1();
-    private Rectangle r;
 
     public Tile(int x, int y, int typeInt) {
         tileX = x * 195;
         tileY = y * 38;
-        r=new Rectangle();
         type = typeInt;
 
         if (type == 1) {
@@ -38,18 +36,10 @@ public class Tile {
 
         tileX += speedX;
         
-        if(type!=0){
-        	checkVerticalCollision(Ship.rect);
-        }
+  
     }
     
-    public void checkVerticalCollision(Rectangle rObj){
-    	if(rObj.intersects(r)){
-    		System.out.println("collision");
-    	}
-    	
-    }
-    
+   
     
 
     public int getTileX() {

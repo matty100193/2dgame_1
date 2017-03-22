@@ -27,7 +27,8 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 	private URL base;
 	private AudioInputStream audioIn;
 	private static Background bg1,bg2;
-	private HMS_Surprise player;
+	private static HMS_Surprise player;
+	private static Acheron enemy;
 	private Image background,ship1,image,ship1_left,ship1_right,currentShip1,expl1,expl2,expl3,expl4,expl5;
 	private Graphics second;
 	public static Image tileocean;
@@ -98,7 +99,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 		try {
 			clip = AudioSystem.getClip();
 			clip.open(audioIn);
-			clip.start();
+			//clip.start();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -118,8 +119,8 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 				}
 			}
 		}
-		
-		player=new HMS_Surprise(10,100);
+		player=new HMS_Surprise(1 ,199);     
+		enemy=new Acheron(1,900);
 		Thread thread=new Thread(this);
 		thread.start();
 	}
@@ -128,11 +129,16 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 	public void run() {
 		if(state==GameState.Running){
 			long durationButtonPress=0;
+			long increaseSpeedEnemy=0;
 			while(true){
 				try {
 					currentShip1=anim.getImage();
 					updateTiles();
+					enemy.update();
 					player.update();
+					
+					
+					//System.out.println("enemy "+enemy.getSpeedX());
 					
 					ArrayList<Cannons> cannonsList=player.getCannonList();
 					for(int i=0;i<cannonsList.size();i++){
@@ -142,7 +148,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 					
 					if(!player.isMovingRight()&&player.getSpeedX()>0 && durationButtonPress<=0){
 						player.stopRight();
-						durationButtonPress=1000;
+						durationButtonPress=175;
 					}
 					
 					bg1.update();
@@ -150,9 +156,14 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 					animate();
 					repaint();
 					if(durationButtonPress>0){
-						durationButtonPress-=100;
+						durationButtonPress-=17;
+					}
+					if(increaseSpeedEnemy>=10000){
+						increaseSpeedEnemy=0;
+						enemy.setSpeedX(enemy.getSpeedX()+1);
 					}
 					
+					increaseSpeedEnemy+=17;
 					Thread.sleep(17);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -191,10 +202,13 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 		for(int i=0;i<list.size();i++){
 			g.setColor(Color.black);
 			g.fillOval((int)list.get(i).getX(), (int)list.get(i).getY(), 8, 8);
+			//g.drawRect((int)list.get(i).getX(), (int)list.get(i).getY(), 8, 8);
 		}
 		g.drawRect((int)player.rect.getX(), (int)player.rect.getY(), (int)player.rect.getWidth(), (int)player.rect.getHeight());
 		g.drawImage(currentShip1, player.getCenterX()-61,player.getCenterY()-63,this );
-		//g.drawImage(animExp.getImage(), player.getCenterX()+180,player.getCenterY()-63, this);
+		
+		g.drawRect((int)enemy.rect.getX(), (int)enemy.rect.getY(), (int)enemy.rect.getWidth(), (int)enemy.rect.getHeight());
+		g.drawImage(currentShip1, enemy.getCenterX()-61, enemy.getCenterY()-63, this);
 		paintTiles(g);
 		
 	}
@@ -226,11 +240,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 				   player.setReadyToMove(false);
 				}
 				break;
-//			case KeyEvent.VK_ENTER:
-//				if(player.isFireReady()){
-//					player.shoot();
-//					player.setFireReady(false);
-//				}
+
 		}
 		
 	}
@@ -242,9 +252,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 				player.setMovingRight(false);
 				player.setReadyToMove(true);
 				break;
-//			case KeyEvent.VK_ENTER:
-//				player.setFireReady(true);
-//				break;
+
 		}
 		
 		
@@ -262,6 +270,14 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 	
 	public static Background getBg2(){
 		return bg2;
+	}
+	
+	public static HMS_Surprise getPlayer(){
+		return player;
+	}
+	
+	public static Acheron getEnemy(){
+		return enemy;
 	}
 
 	@Override
@@ -287,7 +303,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 					public void run() {
 						player.shoot(dir,base);
 					}
-				}, 200);
+				}, 500);
 			}
 			Timer shootTimer=new Timer();
 			shootTimer.schedule(new TimerTask(){
