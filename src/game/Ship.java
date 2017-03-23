@@ -27,6 +27,7 @@ public abstract class Ship {
      public Ship(int movespeed,int centerX){
     	 this.MOVESPEED=movespeed;
     	 this.centerX=centerX;
+    	
      }
 
  	abstract public void update();

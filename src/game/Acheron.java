@@ -16,7 +16,8 @@ public class Acheron extends Ship{
 
 	@Override
 	public void shoot(double dir, URL base) {
-		// TODO Auto-generated method stub
+		 Cannons c=new Cannons(getCenterX()-40,getCenterY()-18,dir,base);
+		 getCannonList().add(c);
 		
 	}
 	private boolean stay=false;
@@ -42,9 +43,7 @@ public class Acheron extends Ship{
 			else centerX+=getSpeedX();
 		}
 		//System.out.println("player: "+player.getSpeedX()+" : enemy speed: "+speedX+" enemy pos: "+getCenterX());
-
-        rect.setRect(getCenterX()-50, getCenterY()-40, 300, 100);
-
+        rect.setBounds(getCenterX()-30, getCenterY()-28, 275, 100);
     }
 
 	@Override

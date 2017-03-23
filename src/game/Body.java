@@ -2,6 +2,7 @@ package game;
 
 import java.applet.Applet;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -99,7 +100,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 		try {
 			clip = AudioSystem.getClip();
 			clip.open(audioIn);
-			//clip.start();
+			clip.start();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -119,8 +120,8 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 				}
 			}
 		}
-		player=new HMS_Surprise(1 ,199);     
-		enemy=new Acheron(1,900);
+		player=new HMS_Surprise(1 ,200);     
+		enemy=new Acheron(1,1000);
 		Thread thread=new Thread(this);
 		thread.start();
 	}
@@ -141,6 +142,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 					//System.out.println("enemy "+enemy.getSpeedX());
 					
 					ArrayList<Cannons> cannonsList=player.getCannonList();
+					ArrayList<Cannons> cannonsListEnemy=enemy.getCannonList();
 					for(int i=0;i<cannonsList.size();i++){
 						if(cannonsList.get(i).isVisible())cannonsList.get(i).update();
 						else cannonsList.remove(i);
@@ -151,6 +153,16 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 						durationButtonPress=175;
 					}
 					
+					//if(enemy.getCenterX()-player.getCenterX()<=800){
+						//System.out.println("in range");
+						
+					//}
+					
+					for(int i=0;i<cannonsListEnemy.size();i++){
+						if(cannonsListEnemy.get(i).isVisible()) cannonsListEnemy.get(i).update();
+						else cannonsListEnemy.remove(i);
+					}
+					
 					bg1.update();
 					bg2.update();
 					animate();
@@ -158,7 +170,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 					if(durationButtonPress>0){
 						durationButtonPress-=17;
 					}
-					if(increaseSpeedEnemy>=10000){
+					if(increaseSpeedEnemy>=10000 && enemy.getSpeedX()<=20){
 						increaseSpeedEnemy=0;
 						enemy.setSpeedX(enemy.getSpeedX()+1);
 					}
@@ -190,6 +202,7 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 		second.setColor(getForeground());
 		paint(second);
 		g.drawImage(image, 0, 0, this);
+		
 	}
 	
 
@@ -204,12 +217,24 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 			g.fillOval((int)list.get(i).getX(), (int)list.get(i).getY(), 8, 8);
 			//g.drawRect((int)list.get(i).getX(), (int)list.get(i).getY(), 8, 8);
 		}
+		
+		ArrayList<Cannons> list1=enemy.getCannonList();
+		for(int i=0;i<list1.size();i++){
+			g.setColor(Color.black);
+			g.fillOval((int)list1.get(i).getX(), (int)list1.get(i).getY(), 8, 8);
+			//g.drawRect((int)list.get(i).getX(), (int)list.get(i).getY(), 8, 8);
+		}
+		
 		g.drawRect((int)player.rect.getX(), (int)player.rect.getY(), (int)player.rect.getWidth(), (int)player.rect.getHeight());
 		g.drawImage(currentShip1, player.getCenterX()-61,player.getCenterY()-63,this );
-		
-		g.drawRect((int)enemy.rect.getX(), (int)enemy.rect.getY(), (int)enemy.rect.getWidth(), (int)enemy.rect.getHeight());
 		g.drawImage(currentShip1, enemy.getCenterX()-61, enemy.getCenterY()-63, this);
+		g.setColor(Color.yellow);
+		g.drawRect((int)enemy.rect.getX(), (int)enemy.rect.getY(), (int)enemy.rect.getWidth(), (int)enemy.rect.getHeight());
 		paintTiles(g);
+		g.setFont(new Font("Times new roman", Font.PLAIN, 25));
+		g.setColor(Color.BLACK);
+		g.drawString("HMS Surprise speed: "+player.getSpeedX()+" knots", 200, 35);
+		g.drawString("Acheron speed: "+enemy.getSpeedX()+" knots, approx distance: "+(enemy.getCenterX()-player.getCenterX()), 775, 35);
 		
 	}
 	
@@ -295,8 +320,10 @@ public class Body extends Applet implements KeyListener, Runnable, MouseListener
 			double dy=my-(player.getCenterY()-13);
 			double dir=Math.atan2(dy, dx);
 			double angle=dir*(180/Math.PI);
+			System.out.println(dir);
 			if(angle>=-85 && angle <=0){
 				player.shoot(dir,base);
+				enemy.shoot(dir, base);
 				Timer shootnext=new Timer();
 				shootnext.schedule(new TimerTask(){
 					@Override

@@ -21,16 +21,16 @@ public class Cannons {
 	private static AudioInputStream audioIn1,audioIn2;
 	private static Clip clip;
 	private static Clip clipSplash1,clipSplash2;
-	public Rectangle r;
+	public Rectangle r=new Rectangle(0,0,0,0);
 	private static int frameFinal1,frameFinal2;
 	private static boolean ready1=true,ready2=true;
+	private static Acheron enemy=Body.getEnemy();
 	
 	
 	public Cannons(int startX,int startY,double dir, URL base){
 		x=startX;
 		y=startY;
 		
-		r=new Rectangle(0,0,0,0);
 		Random rand=new Random();
 		speedX=(int)rand.nextInt(3)+6;
 		visible=true;
@@ -132,6 +132,11 @@ public class Cannons {
 
 	private void checkCollision() {
 
+		if(r!=null && r.intersects(enemy.rect)){
+			System.out.println("hit");
+			visible=false;
+			r=null;                    
+		}
 		
 	}
 
